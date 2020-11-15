@@ -24,6 +24,11 @@ def exp_parameters():
     # CNN Parameters
     exp["layer_Index"] = 16
 
+    exp["features_per_cell"] = 9
+    exp["block_size"] = (32, 32)
+    exp["block_stride"] = (32, 32)
+    exp["cell_size"] = (32, 32)
+
     # GP
     GP_type_index = 0  # ["GP", "GP_Sparse"]
 

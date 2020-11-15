@@ -1,28 +1,22 @@
+"""
+This script allows the user to apply noises randomly on a dataset by configuring
+the path and the other noises related parameters in the "main" function.
+
+"""
+
 import cv2
 import numpy as np
 from glob import glob
 
 
-def motion_blur(img):
-    size = 10
-    kernel_motion_blur = np.zeros((size, size))
-    kernel_motion_blur[int((size-1)/2), :] = np.ones(size)
-    kernel_motion_blur = kernel_motion_blur / size
+def motion_blur(img, filter_size):
+
+    kernel_motion_blur = np.zeros((filter_size, filter_size))
+    kernel_motion_blur[int((filter_size-1)/2), :] = np.ones(filter_size)
+    kernel_motion_blur = kernel_motion_blur / filter_size
 
     # applying the kernel to the input image
     img = cv2.filter2D(img, -1, kernel_motion_blur)
-
-    return img
-
-
-def gaussian_noise(img, level):
-    if level == "Mild":
-        gaussian_filter = (5, 5)
-
-    elif level == "Strong":
-        gaussian_filter = (13, 13)
-
-    img = cv2.GaussianBlur(img, gaussian_filter, 0)
 
     return img
 
@@ -33,18 +27,17 @@ def jpeg_compression(img, image_name):
     return noised_image, image_name
 
 
-def illumination_change(img):
-    factor = 0.2
-    hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    hsv_img[..., 2] = hsv_img[..., 2] * factor
-
-    return cv2.cvtColor(hsv_img, cv2.COLOR_HSV2RGB)
-
-
 def main():
     np.random.seed(0)
 
-    base_path = "H:\\Desktop\\CARA\\Dataset\\"
+    base_path = "..\\Dataset\\"
+
+    # Noises Parameters
+    blur_filter_size = 10
+    strong_gaussian_filter = (5, 5)
+    mild_gaussian_filter = (13, 13)
+
+    first_image_label = 5612  # The label of the first image in the generated noised images
 
     noises_types = ["Motion blur", "Strong Gaussian", "Mild Gaussian", "JPEG compression", "Illumination"]
 
@@ -56,25 +49,21 @@ def main():
         image_name = image_path.split("\\")[-1]
         img = cv2.imread(image_path)
         noise_type = noises_types[np.random.randint(0, len(noises_types))]
-        noise_type = "Illumination"
-        if ii > 672:
-            break
+
         if noise_type == "Motion blur":
-            noised_image = motion_blur(img)
+            noised_image = motion_blur(img, blur_filter_size)
         elif noise_type == "Strong Gaussian":
-            noised_image = gaussian_noise(img, "Strong")
+            noised_image = cv2.GaussianBlur(img, strong_gaussian_filter, 0)
         elif noise_type == "Mild Gaussian":
-            noised_image = gaussian_noise(img, "Mild")
+            noised_image = cv2.GaussianBlur(img, mild_gaussian_filter, 0)
         elif noise_type == "JPEG compression":
             noised_image, image_name = jpeg_compression(img, image_name)
-        elif noise_type == "Illumination":
-            noised_image = illumination_change(img)
         else:
             noised_image = None
             print("No Noise Was Specified!!!")
 
         noised_image_path = base_path + "Noisy\\" + noise_type + "\\" + \
-                            image_name.replace(image_name.split(".")[0], str(ii + 5612))
+                            image_name.replace(image_name.split(".")[0], str(ii + first_image_label))
         cv2.imwrite(noised_image_path, noised_image)
 
 

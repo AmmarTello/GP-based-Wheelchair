@@ -1,17 +1,18 @@
+"""
+
+
+"""
+
 from __future__ import division
-import sys
 import math
 import numpy as np
 import cv2
-from pylsd.lsd import lsd
 from glob import glob
 import pandas as pd
 from openpyxl import load_workbook
-## CLASSICAL METHOD
 
 
 def thetam(pt1, pt2):
-    t1, t2 = pt1[5], pt2[5]  # Lines corressponding to leftmost and rightmost.
 
     a1 = pt1[0]
     b1 = pt1[1]
@@ -42,21 +43,14 @@ def thetam(pt1, pt2):
 
 def angle(pt1, pt2):
     t1, t2 = pt1[5], pt2[5]
-    # if t1<0:
-    #     t1 = t1 + math.pi
-    # if t2<0:
-    #     t2 = t2 + math.pi
+
     if t1 < 0:
         t1 = math.pi + t1
     if t2 < 0:
         t2 = math.pi + t2
 
-    # print "The theta values are {0}, {1}".format(t1*180/math.pi,t2*180/math.pi)
-
     tb = abs(t1 - t2)
     ret = (min(t1, t2) + (tb / 2))
-
-    # print 'The return value is {0}'.format(ret)
 
     return ret
 
@@ -92,8 +86,6 @@ def setvp(event, x, y, flags, param):
         print(x,y)
         v_x = x
         v_y = y
-        # cv2.destroyAllWindows()
-        # k = 27
 
     if event == cv2.EVENT_RBUTTONDOWN:
         print("Right is {},{}".format(x, y))
@@ -116,18 +108,11 @@ def process(lines, img, v_x, v_y, vp_number):
     xrange = range
     for i in xrange(lines.shape[0]):
 
-        pt1 = (int(lines[i, 0]), int(lines[i, 1]))
-        pt2 = (int(lines[i, 2]), int(lines[i, 3]))
-
         x1 = int(lines[i, 0])
         x2 = int(lines[i, 2])
         y1 = int(lines[i, 1])
         y2 = int(lines[i, 3])
         w = int(lines[i, 4])
-
-        # for pt1,pt2 in lines:
-        #     if y1 < y_mean or y2 < y_mean:
-        #         lines.remove(pt1)
 
         if (x1 - x2) != 0:  # Make sure lines are not collinear
             theta = np.arctan2((y2 - y1), (x2 - x1))
@@ -137,48 +122,12 @@ def process(lines, img, v_x, v_y, vp_number):
 
             # Extend the lines to the entire image and compute the intersetion point
             c2 = y1 - m2 * x1
-            x3 = int(img.shape[1] / 1.8 + x1)  # 1000 was chosen arbitrarily (any number higher than half the image width)
+            x3 = int(img.shape[1] / 1.8 + x1)
             y3 = int(m2 * x3 + c2)
-            x4 = int(x1 - img.shape[1] / 1.8)  # 1000 was chosen arbitrarily
+            x4 = int(x1 - img.shape[1] / 1.8)
             y4 = int(m2 * x4 + c2)
 
-            # if y4<v_y:
-            #     y4 = int(v_y)
-
             lines1 = lines[i]
-            # if vp_number == "VP1":
-            #     range_condition = l_mag > 1 and 0.1 < abs(theta) < 1.4
-            # elif vp_number == "VP2":
-            #     range_condition = l_mag > 20 and 0.2 < abs(theta) < 1.1
-            # elif vp_number == "VP3":
-            #     range_condition = l_mag > 30 and 0.2 < abs(theta) < 1.1
-            # elif vp_number == "VP4":
-            #     range_condition = l_mag > 40 and 0.3 < abs(theta) < 1.3
-            # elif vp_number == "VP5":
-            #     range_condition = l_mag > 25 and 0.3 < abs(theta) < 1.3
-            # elif vp_number == "VP6":
-            #     range_condition = l_mag > 20 and 0.3 < abs(theta) < 1.4
-            # elif vp_number == "VP7":
-            #     range_condition = l_mag > 20 and 0.3 < abs(theta) < 1.3
-            # elif vp_number == "VP8":
-            #     range_condition = l_mag > 20 and 0.2 < abs(theta) < 1.0
-            # elif vp_number == "VP9":
-            #     range_condition = l_mag > 15 and 0.3 < abs(theta) < 1.1
-            # elif vp_number == "VP10":
-            #     range_condition = l_mag > 10 and 0.3 < abs(theta) < 1.1
-            # elif vp_number == "VP11":
-            #     range_condition = l_mag > 10 and 0.2 < abs(theta) < 1.4
-            # elif vp_number == "VP12":
-            #     range_condition = l_mag > 1 and 0.3 < abs(theta) < 1.3
-            # elif vp_number == "VP13":
-            #     range_condition = l_mag > 5 and 0.1 < abs(theta) < 0.9
-            # elif vp_number == "VP14":
-            #       range_condition = l_mag > 10 and 0.1 < abs(theta) < 0.8
-            # elif vp_number == "VP15":  # Detect VP Manually
-            # #       range_condition = l_mag > 20 and 0.1 < abs(theta) < 1.4
-            # #       range_condition = l_mag > 1 and 0.1 < abs(theta) < 1.4
-            #         range_condition = True
-            # else:
             range_condition = True
 
             if range_condition:
@@ -193,15 +142,9 @@ def process(lines, img, v_x, v_y, vp_number):
                     if y3 >= y4:
                         y4 = v_y
                         x4 = int((y4 - c2) / m2)
-                        # print 'y3 > y4: {0}, {1}, {2}, {3}'.format(x3,y3,x4,y4)
-                        pt11 = (x4, y4)
-                        pt22 = (x3, y3)
                     else:
                         y3 = v_y
                         x3 = int((y3 - c2) / m2)
-                        # print 'y4 > y3: {0}, {1}, {2}, {3}'.format(x3,y3,x4,y4)
-                        pt11 = (x3, y3)
-                        pt22 = (x4, y4)
 
                 sel_lines[j][0] = int(x3)
                 sel_lines[j][1] = int(y3)
@@ -275,7 +218,7 @@ def classical(img, image_name, vp_number):
     v_x = v_x * (1 / 5675)  # Converting pixels to meters. Scale is 1m = 5675 pixels
     v_y = v_y * (1 / 5675)
 
-    h = 1.6  # 0.47 for umich
+    h = 1.6
     l = 0
 
     w = 0
@@ -319,7 +262,7 @@ def classical(img, image_name, vp_number):
 
 
 def main():
-    path = "H:\\Desktop\\CARA\\Dataset\\Campus\\4\\*.png"
+    path = "..\\Dataset\\Campus\\4\\*.png"
     images_paths = glob(path)
 
     # Read csv into dataframe
@@ -335,8 +278,7 @@ def main():
         print(ii)
         img = cv2.imread(image_path)
         image_name = image_path.split("\\")[-1]
-        # if image_name not in ("5498.png", "5499.png", "5500.png", "5501.png"):
-        #     continue
+
         w, img1, v_x, v_y = classical(img, image_name, "VP" + vp_number)
         df.loc[df["Image"] == image_name, "VP"] = np.round(v_x, 6)
         df.loc[df["Image"] == image_name, "VY"] = np.round(v_y, 6)
@@ -348,32 +290,5 @@ def main():
     writer.save()
 
 
-def main2():
-    readPath = "H:\\Desktop\\CARA\\Dataset - Full\\"
-
-    # Read csv into dataframe
-    csv_name = 'H:/Desktop/CARA/Intelligent-Wheelchair-Platform-master/IROS scripts/Vanishing points (x).xlsx'
-    vpdf = pd.read_excel(csv_name, sheet_name="GT VP")
-    images_names = ["2749.png"]#"vpdf["Image"]
-    temp = []
-    for ii, image_name in enumerate(images_names):
-        print(ii)
-        print(image_name)
-        try:
-            image_path = readPath + image_name
-            img = cv2.imread(image_path)
-            if img is None:
-                continue
-            vp_number = vpdf.loc[vpdf["Image"] == image_name, "VP number"].values
-
-            w, img1, v_x = classical(img, image_name, vp_number)
-            #print("w classical is {}".format(w))
-
-        except:
-            temp.append(image_name)
-
-    print(temp)
-
-
 if __name__ == '__main__':
-    ino = main()
+    main()

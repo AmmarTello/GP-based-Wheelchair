@@ -1,8 +1,11 @@
-import torch.nn as nn
+"""
+In this module, there are functions related to the ResNet18 model which pretrained
+on "ImageNet" and fine-tuned for the corridor following task by "Vishnu Sashank Dorbala"
+"""
+
 import torchvision.models as models
 import torchvision.transforms as transforms
 from torch.autograd import Variable
-from PIL import Image
 from torch import zeros, FloatTensor
 import numpy as np
 import time

@@ -1,17 +1,25 @@
+"""
+This script allows the user to apply a feature extraction method on a specific dataset.
+
+"""
+
 from Image_functions import collect_images_paths
 from HOGFunc import hog_func
 from CNN import CNN
 
-features_extraction_number = 1
-all_features_methods = ["Raw", "Hog", "ResNet18"]
-features_extraction_method = all_features_methods[features_extraction_number]
-dataset_name = "Normal"
+# Initial Configuration
+features_extraction_index = 0   # ["Hog", "ResNet18"]
 
+# ResNet18 layer number (refer to CNN.py)
 layerIndex = 12
 
-base_path = "H:\\Desktop\\CARA\\Dataset\\"
+base_path = "..\\Dataset\\"
+dataset_name = "Normal"
 image_extension = "png"
 image_width, image_height = (224, 224)
+
+all_features_methods = ["Hog", "ResNet18"]
+features_extraction_method = all_features_methods[features_extraction_index]
 
 number_of_images, images_paths, images_labels = collect_images_paths(base_path + dataset_name + "\\", image_extension)
 

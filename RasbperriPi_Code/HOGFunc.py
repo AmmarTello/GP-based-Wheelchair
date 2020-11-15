@@ -1,16 +1,10 @@
-"""
-In this module, HOG related functions are gathered, the user can run this module from Feature_Extraction.py
-
-"""
-
 import cv2
 import numpy as np
-from Image_functions import read_resize_image
+from Configuration import read_resize_image
 import time
 
 
 def hog_parameters():
-
     features_per_cell = 9
     block_size = (32, 32)
     block_stride = (32, 32)
@@ -33,14 +27,28 @@ def extended_hog_parameters(image_height, image_width):
     return derivAperture, winSigma, histogramNormType, L2HysThreshold, gammaCorrection, nlevels, signedGradients, winSize
 
 
+def hog_func_one_image(image, image_height, image_width, hog, winSize):
+
+    # resize_image = read_resize_image(image, image_width, image_height)
+    start = time.time()
+    descriptors = np.transpose(hog.compute(image, winSize))
+    elapsed_time = time.time() - start
+
+    return descriptors, elapsed_time
+
 def hog_func(images_paths, image_height, image_width, dataset_name):
 
     # HoG descriptor parameters
-    features_per_cell, block_size, block_stride, cell_size = hog_parameters()
+    derivAperture = 1
+    winSigma = -1.
+    histogramNormType = 0
+    L2HysThreshold = 0.2
+    gammaCorrection = False
+    nlevels = 64
+    signedGradients = False
+    winSize = (image_width, image_height)
 
-    derivAperture, winSigma, histogramNormType, \
-    L2HysThreshold, gammaCorrection, nlevels, \
-    signedGradients, winSize = extended_hog_parameters(image_height, image_width)
+    features_per_cell, block_size, block_stride, cell_size = hog_parameters()
 
     block_size_in_cell = np.array([block_size])/np.array([cell_size])
     block_overlap = block_size_in_cell - np.array([block_stride])/np.array([cell_size])
