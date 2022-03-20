@@ -1,103 +1,57 @@
-import numpy as np
-from CNN import CNNParameters
-from HOGFunc import hog_parameters
+from exp_preparation import *
+
+# basic_params = namedtuple("basic_params", [])
+# datasets_params = namedtuple("datasets_params", [])
+# hog_params = namedtuple("hog_params", [])
+# resnet18_params = namedtuple("resnet18_params", [])
+# gp_params = namedtuple("gp_params", [])
+# descriptor_params = namedtuple("descriptor_params", [])
+# exp = namedtuple("exp", ["basic_params", "datasets_params", "descriptor_params", "gp_params"])
 
 
-def exp_parameters():
-    exp = dict()
-
-    exp["seed"] = 0
-
-    features_extraction_index = 1  # ["Raw", "Hog", "ResNet18"]
-
-    # Training Parameters
-    train_dataset_indices = [0, 1, 2]  # Dataset Names ["Normal", "Noisy", "Unreliable"]
-
-    # Testing Parameters
-    test_dataset_indices = [0, 1, 2]  # Dataset Names ["Normal", "Noisy", "Unreliable"]
-
-    exp["test_subset_flag"] = 0   # If Noisy
-    test_subset_index = 0         # ["JPEG_Compression", "Mild_Gaussian", "Strong_Gaussian", "Motion_Blur"]
-
-    exp["test_percent"] = 0.1
-
-    # CNN Parameters
-    exp["layer_Index"] = 16
-
-    exp["features_per_cell"] = 9
-    exp["block_size"] = (32, 32)
-    exp["block_stride"] = (32, 32)
-    exp["cell_size"] = (32, 32)
-
-    # GP
-    GP_type_index = 0  # ["GP", "GP_Sparse"]
-
-    # Train GP
-    exp["L0"] = 0  # Initial length scale
-    exp["Sigma0"] = 0.1  # Initial noise standard deviation
-
-    # Train sparse GP
-    exp["M"] = 700  # No. sparse points
-    exp["NoCandidates"] = 1000  # No. of candidate sets of sparse points analysed
-
-    # Image Shape
-    exp["image_width"], exp["image_height"] = (224, 224)
-
-    # Assignments according to the above configuration
-    all_features_methods = ["Raw", "Hog", "ResNet18"]
-    all_datasets = np.array(["Normal", "Noisy", "Unreliable"])
-    test_subsets = np.array(["Normal", "JPEG_Compression", "Mild_Gaussian",
-                             "Strong_Gaussian", "Motion_Blur"])
-    GP_types = ["GP", "GP_Sparse"]
-
-    exp["GP_type"] = GP_types[GP_type_index]
-
-    exp["features_extraction_method"] = all_features_methods[features_extraction_index]
-
-    exp["train_datasets"] = all_datasets[train_dataset_indices]
-
-    exp["test_dataset"] = all_datasets[test_dataset_indices]
-    exp["test_subset"] = test_subsets[test_subset_index]
-
-    return exp
+# Basic Params
+basic_params.seed = 0
+basic_params.save_path = "saved_files/results/"
 
 
-def files_names(exp, dataset_path, save_path):
-    train_datasets = "_".join(exp["train_datasets"])
+# Dataset
+datasets_params.ground_truth_velocities_file_name = "Ground Truth.csv"  # Velocities
 
-    if exp["test_subsets"] is not None:
-        exp["test_datasets"][exp == "Noisy"] = exp["test_subset"]
-        test_dataset_path = dataset_path + "Noisy\\" + exp["test_subset"] + "\\"
-    else:
-        test_dataset_path = dataset_path + exp["test_dataset"] + "\\"
-    test_dataset = "_".join(exp["test_dataset"])
+datasets_params.dataset_path = Datasets.ROOT_FOLDER
+datasets_params.image_extension = ImageExtension.PNG
+datasets_params.image_width, datasets_params.image_height = (224, 224)
 
-    if exp["features_extraction_method"] == "Hog":
-        features_per_cell, block_size, block_stride, cell_size = hog_parameters()
-        features_details = "_".join(["Hog", str(features_per_cell), str(block_size[0]),
-                                    str(block_stride[0]), str(cell_size[0])])
+# Training Parameters
+datasets_params.train_datasets = [Datasets.NORMAL, Datasets.NOISY]  # dataset Names ["normal", "noisy", "unreliable"]
 
-    elif exp["features_extraction_method"] == "ResNet18":
-        layer_name = CNNParameters(exp["features_extraction_method"], exp["layer_Index"])[0]
-        features_details = "_".join([exp["features_extraction_method"], layer_name.replace(".", "_")])
+# Testing Parameters
+datasets_params.test_dataset = Datasets.NOISY  # None for test on all training datasets, or put one dataset index for test on one dataset
 
-    else:
-        features_details = exp["features_extraction_method"]
+datasets_params.test_subset_flag = True   # If noisy
+datasets_params.test_subset = Subsets.MILD_GAUSSIAN      # ["jpeg_compression", "mild_gaussian", "strong_gaussian", "motion_blur"]
 
-    desc_file = []
+datasets_params.test_percent = 0.1
 
-    for dataset in exp["train_datasets"]:
-        desc_file.append("Descriptors/" + dataset + "_" + features_details + "_descriptor.npz")
+# Descriptor
+descriptor_params.descriptor_algorithm = FeatureExtractionAlgorithms.HOG  # ["Raw", "Hog", "ResNet18"]
 
-    saved_file_name = save_path + "\\" + exp["GP_type"] + "_train_" + train_datasets + "_test_" + test_dataset \
-                      + "_" + features_details + ".npz"
+# ResNet18 Parameters
+resnet18_params.layer = Resnet18Layers.LAYER3_0_CONV2
 
-    return saved_file_name, desc_file, test_dataset_path
+# HOG Parameters
+hog_params.features_per_cell = 9
+hog_params.block_size = 32
+hog_params.block_stride = 32
+hog_params.cell_size = 32
+
+# Train GP
+gp_params.L0 = 0.5  # Initial length scale
+gp_params.Sigma0 = 0.1  # Initial noise standard deviation
 
 
-def load_desc(descriptor_file):
-    data = np.load(descriptor_file, allow_pickle=True)
-    descriptors = data["descriptors"]
-    ground_truth_labels = data["images_labels"]
+descriptor_params.params = eval(f"{descriptor_params.descriptor_algorithm}_params")
 
-    return descriptors, ground_truth_labels
+my_exp = exp(basic_params, datasets_params, descriptor_params, gp_params)
+
+
+

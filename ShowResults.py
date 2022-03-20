@@ -18,10 +18,10 @@ def autolabel(rects, all_mse):
 def compute_measures(exp_number, all_features_extraction_methods, dataset_name, test_sets, sub_exp_number=None):
 
     if sub_exp_number is not None:
-        folder_name1 = "Results/Exp" + str(exp_number) + "/" + str(sub_exp_number)
+        folder_name1 = "results/Exp" + str(exp_number) + "/" + str(sub_exp_number)
     else:
-        folder_name1 = "Results/Exp" + str(exp_number)
-    folder_name2 = "Descriptors/"
+        folder_name1 = "results/Exp" + str(exp_number)
+    folder_name2 = "descriptors/"
     image_name = folder_name1 + "/*.npz"
     selected_algorithms = glob(image_name)
 
@@ -59,7 +59,7 @@ def compute_measures(exp_number, all_features_extraction_methods, dataset_name, 
         all_r2_percent.append(r_score_percent)
         print(r_score_percent)
 
-    file_name = "_".join([folder_name1 + folder_name1.replace("/", "_"), "Results.xlsx"])
+    file_name = "_".join([folder_name1 + folder_name1.replace("/", "_"), "results.xlsx"])
 
     wb = openpyxl.Workbook()
 
@@ -92,7 +92,7 @@ expNumber = 8
 sub_exp_number1 = 1
 sub_exp_number2 = 2
 features_extraction_number = 0
-dataset_name = "Noisy"
+dataset_name = "noisy"
 n_groups = 6
 
 all_features_extraction_methods = ["Raw", "Hog", "ResNet18"]
@@ -100,7 +100,7 @@ features_extraction_method = all_features_extraction_methods[features_extraction
 all_titles = ["", "Raw Pixel Values", "Hog", "ResNet18", "Hog, ResNet18 and Raw Pixel Values",
               "Hog", "ResNet18", "Hog and ResNet18", "Raw Pixel Values", "Hog, ResNet18 and Raw Pixel Values"]
 part_of_title = all_titles[expNumber-1]
-test_sets = ["JPEG_Compression", "Motion_Blur", "Mild_Gaussian", "Strong_Gaussian", "Normal"]
+test_sets = ["jpeg_compression", "motion_blur", "mild_gaussian", "strong_gaussian", "normal"]
 
 all_mse1 = compute_measures(expNumber, all_features_extraction_methods, dataset_name, test_sets, sub_exp_number1)
 all_mse2 = compute_measures(expNumber, all_features_extraction_methods, dataset_name, test_sets, sub_exp_number2)
@@ -143,8 +143,8 @@ elif expNumber in (4, 10):
     x_label = 'Features Extraction Method'
 
 elif expNumber == 8:
-    plt.xticks(index + bar_width / 2, ('JPEG_Compression', 'Mild_Gaussian', 'Strong_Gaussian',
-                                       'Motion_Blur', 'Clean', 'Full'), fontsize=14)
+    plt.xticks(index + bar_width / 2, ('jpeg_compression', 'mild_gaussian', 'strong_gaussian',
+                                       'motion_blur', 'Clean', 'Full'), fontsize=14)
     x_label = 'Test Set'
     first_label = 'Hog'
     second_label = 'ResNet18'

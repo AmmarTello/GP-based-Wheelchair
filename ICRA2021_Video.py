@@ -1,7 +1,6 @@
 import time
 import cv2
-from HOGFunc import hog_parameters, extended_hog_parameters
-from GP_New import Predict
+from feature_extraction.hog import hog_parameters, extended_hog_parameters
 import numpy as np
 import matplotlib.pyplot as plt
 from collections import deque
@@ -13,10 +12,10 @@ from sklearn.metrics import r2_score
 exp = 3
 image_height = 480
 image_width = 480
-fileName = "Results\\GP_train_Normal_Noisy_Unreliable_test_Normal_Noisy_Unreliable_Hog_9_32_32_32_old.npz"
-normal_descriptor_name = "Descriptors\\Normal_Hog_9_32_32_32_descriptor.npz"
-noisy_descriptor_name = "Descriptors\\Noisy_Hog_9_32_32_32_descriptor.npz"
-unreliable_descriptor_name = "Descriptors\\Unreliable_Hog_9_32_32_32_descriptor.npz"
+fileName = "saved_files/results\\GP_train_Normal_Noisy_Unreliable_test_Normal_Noisy_Unreliable_Hog_9_32_32_32_old.npz"
+normal_descriptor_name = "descriptors\\Normal_Hog_9_32_32_32_descriptor.npz"
+noisy_descriptor_name = "descriptors\\Noisy_Hog_9_32_32_32_descriptor.npz"
+unreliable_descriptor_name = "descriptors\\Unreliable_Hog_9_32_32_32_descriptor.npz"
 
 with np.load("HKU_angle_3.npz") as results:
     w = results["Y_StarMean"]

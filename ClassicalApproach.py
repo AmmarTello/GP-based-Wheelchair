@@ -156,7 +156,7 @@ def process(lines, img, v_x, v_y, vp_number):
     return sel_lines, thetas, mags, w
 
 
-def classical(img, image_name, vp_number):
+def classical(img, image_name, sss):
     global v_x, v_y, xfin, yfin, showagain, k
     img = cv2.resize(img, (224, 224))  # For Resnet18
     img = cv2.flip(img, 1)
@@ -176,7 +176,7 @@ def classical(img, image_name, vp_number):
             cv2.destroyAllWindows()
             break
 
-    sss = "H:/Desktop/CARA/Dataset/Classic - Campus/{0}".format(image_name)
+    sss = sss + "{0}".format(image_name)
 
     showagain = 1
 
@@ -262,11 +262,17 @@ def classical(img, image_name, vp_number):
 
 
 def main():
+
+    # Images path
     path = "..\\Dataset\\Campus\\4\\*.png"
     images_paths = glob(path)
 
+    # Images save path
+    save_images_path = "H:\\Desktop\\CARA\\dataset\\Classic - Campus\\"
+
     # Read csv into dataframe
-    csv_name = 'H:/Desktop/CARA/Dataset/Vanishing points - Campus.xlsx'
+    csv_name = '..\\dataset\\Vanishing points - Campus.xlsx'
+
     df = pd.read_excel(csv_name, sheet_name="VP All")
     wdf = pd.read_excel(csv_name, sheet_name="w All")
     writer = pd.ExcelWriter(csv_name, engine='openpyxl', mode="a")
@@ -279,7 +285,7 @@ def main():
         img = cv2.imread(image_path)
         image_name = image_path.split("\\")[-1]
 
-        w, img1, v_x, v_y = classical(img, image_name, "VP" + vp_number)
+        w, img1, v_x, v_y = classical(img, image_name, save_images_path)
         df.loc[df["Image"] == image_name, "VP"] = np.round(v_x, 6)
         df.loc[df["Image"] == image_name, "VY"] = np.round(v_y, 6)
         wdf.loc[wdf["Image"] == image_name, "w"] = np.round(w, 6)
