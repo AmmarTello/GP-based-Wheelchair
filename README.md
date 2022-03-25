@@ -4,6 +4,9 @@
 
 - This repo has the implementation of the "Real-time 
 GP-based Wheelchair Corridor Following".
+
+- You can watch this video for the conducted experiments: https://youtu.be/djRVagkdHMI
+
 - The code in this repo can be used as a base framework for further
 experiments on different datasets and different 
   descriptors to be used with GP.
