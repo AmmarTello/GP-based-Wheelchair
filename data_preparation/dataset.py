@@ -7,7 +7,20 @@ from torch.utils.data import Dataset
 
 
 class ImageDataset(Dataset):
+    """
+    General dataset class that responsible of gathering images and apply the required transforms into the images.
+    """
     def __init__(self, dataset_roots, csv_root, transform=None, image_extension="png", read_image_flag=True):
+        """
+        Args:
+            dataset_roots (list): list of datasets roots
+            csv_root (str): the path of the csv file that contains two columns: "image": contains names of images.
+                            "w": contains the ground truth velocities
+            transform (Transform): which is an object of the Transform class to be applied into the images.
+            image_extension (str): the images extension
+            read_image_flag (bool): whether to read the images (True) or just gathering the images paths with the
+                                    corresponding velocities (False).
+        """
         super().__init__()
 
         self.dataset_roots = dataset_roots

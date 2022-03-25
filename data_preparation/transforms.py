@@ -6,7 +6,9 @@ import torchvision.transforms as transforms
 
 
 class TransformerInterface(metaclass=ABCMeta):
-
+    """
+    Interface for the transforms to be applied into the images
+    """
     @abstractmethod
     def transform(self, image):
         pass

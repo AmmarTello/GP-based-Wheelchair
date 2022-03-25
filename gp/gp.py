@@ -1,9 +1,15 @@
+import os
 import numpy as np
 
-from LIRU_GP2 import Train, Predict
+from .gp_lib import Train, Predict
 
 
 class GP:
+    """
+    The main class for the GP model
+    """
+
+    RESULTS_Folder_PATH = "saved_files/results"
 
     @staticmethod
     def train(L0, Sigma0, training_descriptors, training_velocities):
@@ -27,15 +33,29 @@ class GP:
         return {"Y_StarMean": np.array(Y_StarMean), "Y_StarStd": np.array(Y_StarStd),
                 "elapsed_time": np.array(elapsed_time)}
 
-    @staticmethod
-    def save(file_path, exp_config, train_gp_dict, test_gp_dict,
+    @classmethod
+    def save(cls, train_datasets, test_dataset, descriptor_details,
+             exp_config, train_gp_dict, test_gp_dict,
              train_dataset_dict, test_dataset_dict, metrics):
+
+        file_path = cls.get_file_path(train_datasets, test_dataset, descriptor_details)
 
         np.savez(file_path, exp_config=exp_config, trained_gp_dict=train_gp_dict,
                  test_gp_dict=test_gp_dict, train_dataset_dict=train_dataset_dict,
                  test_dataset_dict=test_dataset_dict, metrics=metrics)
 
-    @staticmethod
-    def load(file_path):
+    @classmethod
+    def load(cls, train_datasets, test_dataset, descriptor_details):
+        file_path = cls.get_file_path(train_datasets, test_dataset, descriptor_details)
 
         return np.load(file_path, allow_pickle=True)
+
+    @classmethod
+    def get_file_path(cls, train_datasets, test_dataset, descriptor_details):
+        train_datasets = "_".join(train_datasets)
+        if test_dataset is None:
+            test_dataset = train_datasets
+
+        file_name = "_".join(["gp", "train", train_datasets, "test", test_dataset, descriptor_details])
+
+        return os.path.join(cls.RESULTS_Folder_PATH, file_name)
